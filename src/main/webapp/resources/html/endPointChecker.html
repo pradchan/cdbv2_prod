@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <title>End Point Check</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+              crossorigin="anonymous"/>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"
+                integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+                crossorigin="anonymous"></script>
+        <script src="/resources/js/endPointChecker.js" type="text/javascript"></script>
+        <script type='text/javascript' src='http://maps.oracle.com/mapviewer/jslib/v2.2/oraclemapsv2.js'></script>
+        <script src="https://d19vzq90twjlae.cloudfront.net/leaflet-0.7/leaflet.js"></script>
+        <style>
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row" style="margin-top: 20px; text-align: center;">
+                <select class="form-control form-control-sm col-lg-2" id="selectID">
+                    <option value="1">JSON</option>
+                    <option value="2">XML</option>
+                    <option value="3">SPATIAL</option>
+                    <!--
+                    <option value="4">Cross Data</option>
+                    
+                    -->
+                </select>
+                 
+                <button type="button" class="btn btn-outline-success" style="margin-left: 20px;" onclick="callView();">Change
+                                                                                                                       View</button>
+            </div>
+            <div style="margin-top: 20px; display: none;" id="xmlcontainer">
+                <h3>XML</h3>
+                <p>Order details are stored as XML document in the converge database</p>
+                <div class="tab-content" id="nav-tabContent" style="margin-top:20px;">
+                    <div class="tab-pane fade show active" id="nav-fetch" role="tabpanel"
+                         aria-labelledby="nav-fetch-tab">
+                        <div class="row">
+                            <select id="selectXmlDocumentId" style="width:80px"></select>
+                             
+                            <button class="btn-success primary" onclick="getXmlData()">Fetch</button>
+                             
+                            <button class="btn-danger" onclick="clearScreen()" style="margin-left:20px;">Clear</button>
+                        </div>
+                        <div class="row"
+                             style="             height: 400px;             margin-top: 10px;             margin-bottom: 10px;             overflow-y:scroll;             border:1px solid black;             padding:10px;           "
+                             id="xmlBodyContainer" contenteditable="true"></div>
+                        <div>
+                            <p>
+                                To update the xml document please put query and then value in the below input fields
+                                respectively and then click on update to update the value. for example to update name
+                                tag inside order query will be - &quot;/order/name&quot; ,
+                                <b>don't update id</b>
+                            </p>
+                        </div>
+                        <div class="row">
+                            <button class="btn-success" onclick="insertXmlData()">Insert</button>
+                             
+                            <button class="btn-danger" onclick="deleteXmlData()" style="margin-left:20px;">Delete</button>
+                             
+                            <input type="text" id="queryXml" style="margin-left:20px" placeholder="put query here"/>
+                             
+                            <input type="text" id="valueXml" style="margin-left:20px" placeholder="value"/>
+                             
+                            <button class="btn-primary" onclick="updateXmlData()" style="margin-left:20px;">Update</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 20px;" id="jsoncontainer">
+                <h3>JSON</h3>
+                <p>Product details are stored as JSON document in the converge database</p>
+                <p>To get a prduct detail, please provide us a valid product id. Product (pid) is a numeric unique
+                   identifer for a product. Currently ranging from (1-500)</p>
+                <div class="row">
+                    <input type="text" id="idField" onkeypress="return ensureNumberic(event)"/>
+                     
+                    <button class="btn-success primary" onclick="getJsonById()">Go</button>
+                </div>
+                <div class="row"
+                     style="             height: 400px;             border: 1px solid black;             margin-top: 10px;             margin-bottom: 10px;             padding:10px;           "
+                     id="jsonBodyContainer" contenteditable="true"></div>
+                <div class="row">
+                    <button class="btn-primary" onclick="updateJsonById()">Update</button>
+                     
+                    <button class="btn-danger" onclick="deleteJsonById()" style="margin-left:20px;">Delete</button>
+                     
+                    <button class="btn-success" onclick="insertJson()" style="margin-left:20px;">Insert</button>
+                </div>
+            </div>
+            <div style="margin-top: 20px;display: none;" id="spatialcontainer">
+                <h3>Spatial</h3>
+                <p>City_points is a table which contains the location points for different cities across the world.</p>
+                <button class="btn btn-primary" onclick="getAllCity();">Fetch Citites</button>
+                <div class="row" id="map"
+                     style="height: 400px;border: 1px solid black;margin-top: 10px;margin-bottom: 10px;padding:10px;"></div>
+                <div class="row">
+                    <input type="text" placeholder="City" id="spatialCity"/>
+                     
+                    <input type="text" placeholder="Longitude" id="spatialLong"/>
+                     
+                    <input type="text" placeholder="Latitude" id="spatialLat"/>
+                     
+                    <button class="btn btn-success" id="spatialButton" onclick="insertNewCity()">PIN CITY</button>
+                </div>
+                <div class="row">
+                    <select id="selectSpatialCityId" style="width:80px"></select>
+                     
+                    <button class="btn-danger btn" onclick="unpinCity()">UNPIN CITY</button>
+                </div>
+            </div>
+            <div style="margin-top: 20px;display: none;" id="crosscontainer">
+                <h3>Cross Data</h3>
+            </div>
+        </div>
+    </body>
+</html>
